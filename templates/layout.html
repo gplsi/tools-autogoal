@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaz Autogoal</title>
+    <link rel="stylesheet" href="/static/boostrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        .tablero {
+            width: 500px; /* Tamaño predeterminado del tablero */
+            height: 300px; /* Tamaño predeterminado del tablero */
+            overflow-y: auto; /* Desplazamiento vertical */
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .tablero-models {
+            all: inherit; /* Hereda todos los estilos de .tablero */
+            height: 500px;
+            overflow-x: auto; /* Agrega desplazamiento horizontal */
+        }
+        .mensaje {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            word-wrap: break-word; /* Hacer que el texto se divida en varias líneas */
+        }
+    </style>
+</head>
+
+<body>
+<!-- new code-->
+<!-- HEADER START  -->
+
+
+<nav class="navbar profile-navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img class="main-logo" src="/static/images/logo-autogoal.png">
+
+        </a>
+        <!-- DROPDOWN START  -->
+
+        <div>
+
+            <label class="switch">
+                <input type="checkbox" onclick="myFunction()">
+                <span class="slider round"></span>
+            </label>
+
+
+        </div>
+
+        <!-- DROPDOWN END  -->
+</nav>
+
+
+<!-- HEADER END  -->
+
+    {% block body %}
+    {% endblock %}
+
+
+    <!-- SCRIPTS  -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    </script>
+
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('.image-upload-wrap').hide();
+
+                    $('.file-upload-image').attr('src', e.target.result);
+                    $('.file-upload-content').show();
+                    $('.file-upload-btn').hide();
+                    $('.image-title').html(input.files[0].name);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+
+            } else {
+                removeUpload();
+            }
+        }
+
+        function removeUpload() {
+            $('.file-upload-input').replaceWith($('.file-upload-input').clone());
+            $('.file-upload-content').hide();
+            $('.image-upload-wrap').show();
+            $('.file-upload-btn').show();
+        }
+        $('.image-upload-wrap').bind('dragover', function () {
+            $('.image-upload-wrap').addClass('image-dropping');
+        });
+        $('.image-upload-wrap').bind('dragleave', function () {
+            $('.image-upload-wrap').removeClass('image-dropping');
+        });
+    </script>
+
+    <script>
+        var slider = document.getElementById("inputVal");
+        var output = document.getElementById("resultParameter-1");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+        }
+    </script>
+    <script>
+        var slider2 = document.getElementById("crossval");
+        var output2 = document.getElementById("resultParameter-2");
+        output2.innerHTML = slider2.value;
+
+        slider2.oninput = function () {
+            output2.innerHTML = this.value;
+        }
+    </script>
+    <script>
+        var slider3 = document.getElementById("limite");
+        var output3 = document.getElementById("resultParameter-3");
+        output3.innerHTML = slider3.value;
+
+        slider3.oninput = function () {
+            output3.innerHTML = this.value;
+        }
+    </script>
+    <script>
+        var slider4 = document.getElementById("maxTime");
+        var output4 = document.getElementById("resultParameter-4");
+        output4.innerHTML = slider4.value;
+
+        slider4.oninput = function () {
+            output4.innerHTML = this.value;
+        }
+    </script>
+
+    <script>
+            // Navegacion tabs proceso 
+// Evento 'click' para todos los botones
+$('button').on('click', function (e) {
+    var href = $(this).attr('href');
+
+    // Verifica si el href está definido
+    if (href) {
+        e.preventDefault(); // Previene la acción predeterminada del botón
+
+        var $targetTab = $('a[href="' + href + '"]');
+
+        // Verifica si el elemento <a> existe y simula un clic en él
+        if ($targetTab.length) {
+            $targetTab.trigger('click');
+        } else {
+            console.error('No se encontró un elemento <a> correspondiente para:', href);
+        }
+    }
+});
+
+// Evento shown.bs.tab para manejar la activación de la pestaña con elementos <a>
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    var href = $(e.target).attr('href');
+    var $curr = $(".process-model a[href='" + href + "']").parent();
+
+    $('.process-model li').removeClass();
+
+    $curr.addClass("active");
+    $curr.prevAll().addClass("visited");
+});
+
+
+
+
+
+
+
+
+            // fin Navegacion tabs proceso 
+
+     
+    </script>
+    <script>
+// modo oscuro
+
+        function myFunction() {
+            var element = document.body;
+            element.classList.toggle("dark-mode");
+        }
+
+
+
+
+
+        //*********************************************Datos
+
+// Obtener elementos del DOM
+var inputCsv = document.getElementById("inputDataCsv");
+var clearFileBtn = document.getElementById("clearFile");
+var variablesIndependientesDisponibles = document.getElementById("variablesIndependientesDisponibles");
+var variablesDependientesDisponibles = document.getElementById("variablesDependientesDisponibles");
+var variablesDependientes = document.getElementById("variablesDependientes");
+var variablesIndependientes = document.getElementById("variablesIndependientes");
+
+// Función para actualizar los selects
+function actualizarSelectsConVariables(variables) {
+  variablesIndependientesDisponibles.innerHTML = '';
+  variablesDependientesDisponibles.innerHTML = '';
+  variables.forEach(function(variable) {
+    ['variablesIndependientesDisponibles', 'variablesDependientesDisponibles'].forEach(function(selectId) {
+      var option = document.createElement("option");
+      option.value = variable;
+      option.text = variable;
+      document.getElementById(selectId).appendChild(option);
+    });
+  });
+}
+
+// Función para limpiar el formulario
+function clearFile() {
+  inputCsv.value = "";
+  localStorage.clear();
+  actualizarSelectsConVariables([]);
+  document.getElementById("fileName").classList.add("d-none");
+  alert("Archivo eliminado correctamente");
+}
+
+// Escuchar cambios en el input del archivo
+inputCsv.addEventListener("change", function() {
+  var file = inputCsv.files[0];
+  document.getElementById("fileName").innerHTML = "Archivo seleccionado: " + file.name;
+  document.getElementById("fileName").classList.remove("d-none");
+  var reader = new FileReader();
+  reader.readAsText(file);
+  reader.onload = function() {
+  try {
+    var fileText = reader.result.replace(/\r\n/g, '\n');
+
+    // Check if the file has fields enclosed in double quotes
+    var hasQuotedFields = fileText.includes('","');
+
+    if (!hasQuotedFields) {
+      // If the file does not have fields enclosed in double quotes, remove all double quotes
+      fileText = fileText.replace(/"/g, '');
+    }
+
+    Papa.parse(fileText, {
+        delimiter: ',',  // Carácter delimitador (por defecto es la coma)
+        header: true,    // Indicates whether the first row contains column headers
+        complete: function(results) {
+          var allData = results.data;
+          var variables = Object.keys(allData[0]);
+          
+          // Almacenar el arreglo en localStorage
+          localStorage.setItem("datosCSV", JSON.stringify(allData));
+          actualizarSelectsConVariables(variables);
+          
+          allData.forEach(function(row) {
+            // Mostrar los valores en la consola
+            console.log(row);
+          });
+          alert("Archivo: " + file.name + " ha sido cargado correctamente");
+
+          // Lógica para cambiar a la pestaña de selección de variables
+          var tab = document.getElementById("seleccionVariablesTab");
+          var tabPane = document.getElementById("seleccionVariables");
+          var tabs = document.getElementById("cargaCsvTab");
+          var tabsPane = document.getElementById("cargaCsv");
+          var tabLink = document.getElementById("seleccionVariablesLink");
+          var tabsLink = document.getElementById("cargaCsvLink");
+          tabs.classList.remove("active");
+          tabs.classList.add("visited");
+          tabLink.classList.add("show");
+          tabLink.classList.add("active");
+          tabsLink.classList.remove("show");
+          tabsLink.classList.remove("active");
+          tabsPane.classList.remove("active");
+          tab.classList.add("active");
+          tabPane.classList.add("active");
+        },
+        error: function(error) {
+          console.error(error.message);
+          alert("Error al leer el archivo, por favor, asegúrese de seleccionar un archivo CSV válido");
+        }
+      });
+    } catch (e) {
+      console.error(e.message);
+      alert("Error al leer el archivo, por favor, asegúrese de seleccionar un archivo CSV válido");
+    }
+  };
+});
+
+// Cargar variables almacenadas en localStorage al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  var storedVariables = JSON.parse(localStorage.getItem("variables")) || [];
+  actualizarSelectsConVariables(storedVariables);
+});
+
+// Añadir variable dependiente
+addDependiente.addEventListener("click", function() {
+    var variablesDependientesDisponibles = document.getElementById("variablesDependientesDisponibles");
+    var selectedOption = variablesDependientesDisponibles.options[variablesDependientesDisponibles.selectedIndex];
+    if (selectedOption) {
+        var selectDependientes = document.getElementById("variablesDependientes");
+        var option = document.createElement("option");
+        option.value = selectedOption.value;
+        option.text = selectedOption.text;
+        selectDependientes.appendChild(option);
+        
+        // Eliminar la opción de las variables independientes disponibles
+        removeOptionFromSelect("variablesIndependientesDisponibles", selectedOption.value);
+        
+        // Eliminar la opción de las variables dependientes disponibles
+        variablesDependientesDisponibles.remove(variablesDependientesDisponibles.selectedIndex);
+    }
+});
+
+// Eliminar variable dependiente
+removeDependiente.addEventListener("click", function() {
+    var selectDependientes = document.getElementById("variablesDependientes");
+    var selectedOption = selectDependientes.options[selectDependientes.selectedIndex];
+    if (selectedOption) {
+        addOptionToSelect("variablesDependientesDisponibles", selectedOption);
+        addOptionToSelect("variablesIndependientesDisponibles", selectedOption);
+        selectDependientes.remove(selectDependientes.selectedIndex);
+    }
+});
+
+// Añadir variable independiente
+addIndependiente.addEventListener("click", function() {
+    var variablesIndependientesDisponibles = document.getElementById("variablesIndependientesDisponibles");
+    var selectedOption = variablesIndependientesDisponibles.options[variablesIndependientesDisponibles.selectedIndex];
+    if (selectedOption) {
+        var selectIndependientes = document.getElementById("variablesIndependientes");
+        var option = document.createElement("option");
+        option.value = selectedOption.value;
+        option.text = selectedOption.text;
+        selectIndependientes.appendChild(option);
+        
+        // Eliminar la opción de las variables dependientes disponibles
+        removeOptionFromSelect("variablesDependientesDisponibles", selectedOption.value);
+        
+        // Eliminar la opción de las variables independientes disponibles
+        variablesIndependientesDisponibles.remove(variablesIndependientesDisponibles.selectedIndex);
+
+        this.disabled = true;
+    }
+});
+
+// Eliminar variable independiente
+removeIndependiente.addEventListener("click", function() {
+    var selectIndependientes = document.getElementById("variablesIndependientes");
+    var selectedOption = selectIndependientes.options[selectIndependientes.selectedIndex];
+    if (selectedOption) {
+        addOptionToSelect("variablesIndependientesDisponibles", selectedOption);
+        addOptionToSelect("variablesDependientesDisponibles", selectedOption);
+        selectIndependientes.remove(selectIndependientes.selectedIndex);
+
+        // Enable the "addIndependiente" button
+        document.getElementById('addIndependiente').disabled = false;
+    }
+});
+
+// Funciones auxiliares
+function removeOptionFromSelect(selectId, value) {
+    var select = document.getElementById(selectId);
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === value) {
+            select.remove(i);
+            break;
+        }
+    }
+}
+
+function addOptionToSelect(selectId, option) {
+    var select = document.getElementById(selectId);
+    var newOption = document.createElement("option");
+    newOption.value = option.value;
+    newOption.text = option.text;
+    select.appendChild(newOption);
+}
+
+
+var confirmarVariables = document.getElementById("confirmarVariables");
+
+confirmarVariables.addEventListener("click", function() {
+    var selectDependientes = document.getElementById("variablesDependientes");
+    var selectIndependientes = document.getElementById("variablesIndependientes");
+    var variablesDependientes = [];
+    var variablesIndependientes = [];
+
+    for (var i = 0; i < selectDependientes.options.length; i++) {
+        variablesDependientes.push(selectDependientes.options[i].text);
+    }
+
+    for (var i = 0; i < selectIndependientes.options.length; i++) {
+        variablesIndependientes.push(selectIndependientes.options[i].text);
+    }
+
+    var variables = {
+        variablesPredictoras: variablesDependientes,
+        variablesObjetivo: variablesIndependientes
+    };
+
+    var variablesJSON = JSON.stringify(variables);
+    console.log(variablesJSON);
+    // Aquí puedes guardar las variablesJSON en una variable global o enviarlo mediante una petición AJAX a un servidor
+    localStorage.setItem("seleccionadas", JSON.stringify(variablesJSON));
+
+    alert("Las variables " + variablesDependientes.toString() + " , " + variablesIndependientes.toString() + " han sido confirmadas correctamente");
+
+    // Función para hacer clic en el enlace después de cerrar la alerta
+    window.addEventListener('focus', function onAlertClose() {
+        var contentLink = document.querySelector('a[href="#content"]');
+        if (contentLink) {
+            contentLink.click();
+        }
+        window.removeEventListener('focus', onAlertClose); // Remover el listener después de su ejecución
+    });
+});
+</script>
+
+
+<script>
+function saveProblemSelection() {
+    // Obtener el valor seleccionado del tipo de problema
+    var tipoProblema = document.querySelector('input[name="tipoDeProblema"]:checked').value;
+
+    // Guardar el valor en la caché del navegador
+    localStorage.setItem("problemaSeleccionado", tipoProblema);
+
+    // Mostrar un mensaje al usuario
+    alert("Tipo de problema guardado correctamente: " + tipoProblema);
+
+    // Función para hacer clic en el enlace después de cerrar la alerta
+    window.addEventListener('focus', function onAlertClose() {
+        var cargaCsvLink = document.querySelector('a[href="#cargaCsv"]');
+        if (cargaCsvLink) {
+            cargaCsvLink.click();
+        }
+        window.removeEventListener('focus', onAlertClose); // Remover el listener después de su ejecución
+    });
+
+    // Ocultar todos los selects que comienzan con 'select-'
+    var todosLosSelects = document.querySelectorAll("select[class^='select-']");
+    todosLosSelects.forEach(function(select) {
+        select.style.display = 'none';
+    });
+
+    // Mostrar solo el select que coincide con el tipoDeProblema seleccionado
+    var selectEspecifico = document.querySelector("select.select-" + tipoProblema);
+    if (selectEspecifico) {
+        selectEspecifico.style.display = 'block';
+    }
+}
+
+// Añadir manejador de eventos al botón de confirmación
+document.getElementById('confirmarTipoBtn').addEventListener('click', function(e) {
+    e.preventDefault(); // Previene el comportamiento predeterminado del formulario
+    saveProblemSelection();
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() { 
+    document.getElementById('confirmarParametros').addEventListener('click', function() {
+        // Obtener valores de los inputs
+        var limite = document.getElementById('limite').value;
+        var crossval = document.getElementById('crossval').value;
+        var inputVal = document.getElementById('inputVal').value;
+        var maxTime = document.getElementById('maxTime').value;
+        var title = document.getElementById('title').value;
+        var description = document.getElementById('description').value;
+
+        // Obtener el valor de la clave 'problemaSeleccionado' desde el Local Storage
+        var problemaSeleccionado = localStorage.getItem('problemaSeleccionado');
+
+        // Encontrar el select que contenga el valor almacenado en 'problemaSeleccionado'
+        var select = document.querySelector('select[class*="' + problemaSeleccionado + '"]');
+        var selectValue = select ? select.value : null;
+
+        var selectDataType = document.querySelector('select[name="selectDataType"]');
+        var selectDataTypeValue = selectDataType ? selectDataType.value : null;
+
+        // Almacenar los valores en el Local Storage
+        localStorage.setItem('limite', limite);
+        localStorage.setItem('crossval', crossval);
+        localStorage.setItem('inputVal', inputVal);
+        localStorage.setItem('maxTime', maxTime);
+        localStorage.setItem('metrica', selectValue);
+        localStorage.setItem('dataType', selectDataTypeValue);
+        localStorage.setItem('title', title);
+        localStorage.setItem('description', description);
+
+        // Mostrar una alerta al usuario
+        alert('Parámetros confirmados correctamente');
+
+        // Función para hacer clic en el enlace después de cerrar la alerta
+        window.addEventListener('focus', function onAlertClose() {
+            var reportingLink = document.querySelector('a[href="#reporting"]');
+            if (reportingLink) {
+                reportingLink.click();
+            }
+            window.removeEventListener('focus', onAlertClose); // Remover el listener después de su ejecución
+        });
+
+        // Recoger los valores de localStorage
+        const keys = ['metrica', 'inputVal', 'crossval', 'limite','maxTime','dataType','title','description', 'seleccionadas', 'problemaSeleccionado'];
+        let data = {};
+        keys.forEach(key => {
+            data[key] = localStorage.getItem(key);
+        });
+
+        // Parse the CSV data and selected columns back to their original formats
+        var datosCSV = JSON.parse(localStorage.getItem('datosCSV'));
+        // Parse the selected columns back to their original format
+        var seleccionadasObj = JSON.parse(JSON.parse(localStorage.getItem('seleccionadas').trim()));
+
+        // Combine the predictor and target variables into one array
+        var todasLasVariables = seleccionadasObj.variablesPredictoras.concat(seleccionadasObj.variablesObjetivo);
+
+        // Convertir los datos a JSON
+        const jsonStr = JSON.stringify(data);   
+
+        // Crear dos arrays para almacenar los datos de cada archivo
+        var archivo1 = [];
+        var archivo2 = [];
+
+        console.log(datosCSV);
+
+        datosCSV.forEach(function(row, index) {
+            var selectedData = {};
+            todasLasVariables.forEach(function(column) {
+                // Intentar buscar la columna tanto con como sin un espacio al principio
+                var adjustedColumn = row.hasOwnProperty(" " + column) ? " " + column : column;
+                // Convertir el valor a número si es posible
+                var value = isNaN(Number(row[adjustedColumn])) ? row[adjustedColumn] : Number(row[adjustedColumn]);
+                selectedData[column] = value;
+            });
+
+            var dataSinUltimaColumna = {...selectedData};
+            delete dataSinUltimaColumna[todasLasVariables[todasLasVariables.length - 1]];
+            archivo1.push(dataSinUltimaColumna);
+            archivo2.push({[todasLasVariables[todasLasVariables.length - 1]]: selectedData[todasLasVariables[todasLasVariables.length - 1]]});
+        });
+
+        // datosCSV.forEach(function(row, index) {
+        //     var selectedData = {};
+        //     todasLasVariables.forEach(function(column) {
+        //         selectedData[column] = row[column];
+        //     });
+
+        //     var dataSinUltimaColumna = {...selectedData};
+        //     delete dataSinUltimaColumna[todasLasVariables[todasLasVariables.length - 1]];
+        //     archivo1.push(dataSinUltimaColumna);
+        //     archivo2.push({[todasLasVariables[todasLasVariables.length - 1]]: selectedData[todasLasVariables[todasLasVariables.length - 1]]});
+        // });
+        
+        console.log(archivo1);
+        // Convertir cada array en una cadena de texto
+        window.valueTxt1 = archivo1.map(obj => Object.values(obj).join(' ')).join('\n');
+        window.valueTxt2 = archivo2.map(obj => Object.values(obj)).join('\n');
+    });
+});
+
+</script>
+
+<script>
+    //Script que muestra que ejecuta el entrenamiento y recibe los mensajes que este genera.
+    let primerIntervalId;
+    let segundoIntervalId;
+
+    async function obtenerDatosPrimerScript() {
+        const response = await fetch('/datos');
+        const data = await response.json();
+        const tablero = document.getElementById('tablero');
+        const tablero2 = document.getElementById('tablero2');
+        const exportButton = document.getElementById('exportButton');
+        const predictButton = document.getElementById('predictButton');
+        
+        if (data.length > 0) {
+            tablero2.style.display = 'none'; // Ocultar el tablero
+            predictButton.style.display = 'none'; // Ocultar el botón
+            exportButton.style.display = 'none'; // Ocultar el botón
+            tablero.style.display = 'block'; // Mostrar el tablero si hay mensajes
+            tablero.innerHTML = '';
+            data.forEach(mensaje => {
+                const mensajeElemento = document.createElement('div');
+                mensajeElemento.classList.add('mensaje');
+                mensajeElemento.textContent = mensaje;
+                tablero.appendChild(mensajeElemento);
+            });
+        } else {
+            tablero2.style.display = 'none'; // Ocultar el tablero
+            exportButton.style.display = 'none'; // Ocultar el botón
+            predictButton.style.display = 'none'; // Ocultar el botón
+            tablero.style.display = 'block'; // Mostrar el tablero si hay mensajes
+            tablero.innerHTML = '';
+            const mensajeElemento = document.createElement('div');
+            mensajeElemento.classList.add('mensaje');
+            mensajeElemento.textContent = 'Incializando búsqueda...';
+            tablero.appendChild(mensajeElemento);
+
+        }
+    }
+    async function obtenerDatosSegundoScript() {
+        const response = await fetch('/datos');
+        const data = await response.json();
+        const tablero = document.getElementById('tablero');
+        const tablero2 = document.getElementById('tablero2');
+        const exportButton = document.getElementById('exportButton');
+        const predictButton = document.getElementById('predictButton');
+        
+        if (data[data.length - 1] === "Search finished") {
+            if (data.length >= 3) {
+                data[data.length - 3] = "<strong>" + localStorage.getItem("metrica") + "</strong>: " + data[data.length - 3];
+            } 
+            tablero.style.display = 'none'; // Ocultar el tablero
+            tablero2.innerHTML = '';
+            tablero2.style.display = 'block'; // Mostrar el tablero2
+            exportButton.style.display = 'block'; // Mostrar el botón
+            predictButton.style.display = 'block'; 
+            data.forEach(mensaje => {
+                const mensajeElemento = document.createElement('div');
+                mensajeElemento.classList.add('mensaje');
+                mensajeElemento.innerHTML = mensaje;
+                tablero2.appendChild(mensajeElemento);
+            });
+
+            clearInterval(segundoIntervalId); // Detener la ejecución del setInterval del segundo script
+            segundoIntervalId = null;
+
+            // Detener la ejecución del setInterval del primer script
+            clearInterval(primerIntervalId);
+            primerIntervalId = null;
+        }
+    }
+    async function sendData(train_data, train_labels, jsonStr) {
+        try {
+            const chunkSize = 1000000; // Define el tamaño de los trozos aquí
+            const files = [
+                { name: "train_data", data: train_data },
+                { name: "train_labels", data: train_labels }
+            ];
+
+            const uniqueId = Date.now(); // Genera un identificador único
+
+            for (let file of files) {
+                for (let i = 0; i < file.data.length; i += chunkSize) {
+                    const chunk = file.data.slice(i, i + chunkSize);
+                    const response = await fetch('save_txt', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain',
+                            'X-File-Info': file.name,
+                            'X-Unique-Id': uniqueId 
+                        },
+                        body: chunk
+                    });
+                    const data = await response.json();
+                }
+            }
+
+            // Enviar datos del modelo al servidor
+            const response2 = await fetch('/save_json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: jsonStr
+            })
+            const data2 = await response2.json();
+            alert('La búsqueda ha sido confirmada correctamente.');
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    document.getElementById('startButton').addEventListener('click', function() {
+        // Recoger los valores de localStorage
+        const keys = ['metrica', 'inputVal', 'crossval', 'limite','maxTime','dataType','title','description', 'seleccionadas', 'problemaSeleccionado'];
+        const viewButton = document.getElementById('viewTrainModels');
+        const modelosSelect = document.getElementById('modelosDisponibles');
+        const textModels = document.getElementById('showModels');
+        let data = {};
+        keys.forEach(key => {
+            data[key] = localStorage.getItem(key);
+        });
+
+        // Convertir los datos a JSON
+        const jsonStr = JSON.stringify(data);
+        viewButton.style.display = 'block'; 
+        modelosSelect.style.display = 'none';
+        textModels.style.display = 'none';
+
+
+        sendData(window.valueTxt1,window.valueTxt2, jsonStr);
+
+        if(!primerIntervalId){
+            primerIntervalId = setInterval(obtenerDatosPrimerScript, 3000); // Actualizar cada 3 segundos
+            segundoIntervalId = setInterval(obtenerDatosSegundoScript, 5000); // Actualizar cada 5 segundos
+        }
+    });
+
+</script>
+
+<script>
+    //Obtener fichero .zip con el modelo entrenado
+    document.getElementById('exportButton').addEventListener('click', function() {
+        // Make a GET request to the '/get_zipmodel' endpoint
+        fetch('/get_zipmodel')
+        .then(response => response.blob())
+        .then(blob => {
+            // Create a new Blob from the response data
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'model.zip';
+            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+            a.click();    
+            a.remove();  //afterwards we remove the element again         
+        });
+    });
+</script>
+
+<script>
+    var predecirResultado = document.getElementById('predictButton');
+
+    predecirResultado.addEventListener("click", function() {
+        var titulo = localStorage.getItem('title');
+
+        if(titulo){
+            document.getElementById('model-title').textContent = titulo;
+        } else {
+            console.log("No hay datos almacenados en localStorage de titulo");
+        }
+        
+        var seleccionadasObj = JSON.parse(JSON.parse(localStorage.getItem('seleccionadas').trim()));
+        var predictoras = seleccionadasObj.variablesPredictoras;
+
+        var contenedorDatos = document.getElementById('container-variables');
+
+        // Limpiar el contenedor antes de agregar nuevos elementos
+        contenedorDatos.innerHTML = '';
+
+        // Iterar sobre los datos y crear elementos HTML para mostrarlos
+        for (var clave in predictoras) {
+            if (predictoras.hasOwnProperty(clave)) {
+                var valor = predictoras[clave];
+                var parrafo = document.createElement('p');
+                parrafo.textContent = valor + ': ';
+                
+                // Crear un campo de entrada para introducir valores
+                var input = document.createElement('input');
+                input.setAttribute('type', 'text');
+                input.setAttribute('placeholder', 'Mismo formato que CSV');
+                input.setAttribute('data-variable', clave); // Asigna un ID único a cada campo de entrada
+                
+                // Agregar el campo de entrada al párrafo
+                parrafo.appendChild(input);
+                
+                // Agregar el párrafo al contenedor
+                contenedorDatos.appendChild(parrafo);
+            }
+        }
+
+        alert("Pasando a probar el modelo");
+
+        // Función para hacer clic en el enlace después de cerrar la alerta
+        window.addEventListener('focus', function onAlertClose() {
+            var predictionLink = document.querySelector('a[href="#prediction"]');
+            if (predictionLink) {
+                predictionLink.click();
+            }
+            window.removeEventListener('focus', onAlertClose); // Remover el listener después de su ejecución
+        });
+    });  
+</script>
+
+<script>   
+    dataString = "";
+    async function getResult(datos) {
+        try{
+            // Enviar datos del modelo al servidor
+            const response = await fetch('/get_result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos)
+            })
+            alert('Se ha realizado la predicción correctamente');
+
+            dataString = await response.text(); 
+            let contenido = dataString.slice(1, -1);
+
+            document.getElementById("resultadoModelo").innerText = contenido;
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    document.getElementById('obtenerSolucion').addEventListener('click', function() {
+        var valoresIntroducidos = {}; // Objeto para almacenar los valores introducidos
+
+        var camposDeEntrada = document.querySelectorAll('#container-variables input');
+        camposDeEntrada.forEach(function(input) {
+            var clave = input.getAttribute('data-variable'); // Obtiene la clave asociada al campo de entrada
+            var valor = input.value; // Obtiene el valor introducido en el campo de entrada
+            valoresIntroducidos[clave] = valor; // Almacena el valor con su clave correspondiente
+        });
+
+        const values = JSON.stringify(valoresIntroducidos);
+        var titulo = document.getElementById('model-title').textContent;
+
+        // Crear un objeto que contenga tanto el título como los valores JSON
+        const datosCompletos = {
+            titulo: titulo,
+            valoresJSON: values
+        };
+
+        console.log(datosCompletos)
+
+        getResult(datosCompletos);
+    });
+</script>
+
+
+
+<script>
+    //Obtener fichero .zip con los datos procesados preparados para enviar al framework para su entrenamiento
+    document.getElementById('exportDataButton').addEventListener('click', function() {
+
+        // Split valueTxt2 into chunks of 100 lines
+        const length = window.valueTxt2.split('\n').length;
+        var chunks = window.valueTxt2.split('\n').map((v, i, a) => a.slice(i*(length-1), i*(length-1) + (length-1))).filter(v => v.length);
+
+        // Create a new JSZip instance
+        var zip = new JSZip();
+
+        // Add your files to the zip
+        zip.file("train_data.txt", window.valueTxt1);
+
+        // Add each chunk of valueTxt2 to the zip as a separate file
+        for (let i = 0; i < chunks.length-1; i++) {
+            zip.file(`train_labels${i}.txt`, chunks[i].join('\n'));
+        }
+
+        // Generate the zip file as a Blob
+        zip.generateAsync({type:"blob"})
+        .then(function(content) {
+            // Create a new Blob object from the zip content
+            var blob = new Blob([content], {type: "application/zip"});
+            
+            // Create a data URL from the Blob
+            var url = URL.createObjectURL(blob);
+
+            // Create a new link element
+            var link = document.createElement("a");
+
+            // Set the href and download attributes of the link
+            link.href = url;
+            link.download = "data.zip";
+
+            // Append the link to the body
+            document.body.appendChild(link);
+
+            // Simulate a click on the link
+            link.click();
+
+            // Remove the link from the body
+            document.body.removeChild(link);
+        });
+
+        // Descargar el archivo JSON
+        // Recoger los valores de localStorage
+        const keys = ['metrica', 'inputVal', 'crossval', 'limite','maxTime','dataType', 'title', 'description', 'seleccionadas', 'problemaSeleccionado'];
+        let data = {};
+        keys.forEach(key => {
+            data[key] = localStorage.getItem(key);
+        });
+
+        // Convertir el objeto a una cadena de texto JSON
+        const jsonStr = JSON.stringify(data);
+
+        const a = document.createElement("a");
+        const file = new Blob([jsonStr], {type: 'application/json'});
+        a.href = URL.createObjectURL(file);
+        a.download = 'data.json';
+        a.click();
+    });
+</script>
+
+
+<script>
+    //Obtener descripción de los modelos preentrenados en el framework
+    async function obtenerDatosModelos() {
+        const response = await fetch('/getTrainModels');
+        const dataString = await response.text(); // Obtener la respuesta como texto
+
+        // Analizar el string como JSON
+        const dataArray = JSON.parse(JSON.parse(dataString));
+
+        const viewButton = document.getElementById('viewTrainModels');
+        const modelosSelect = document.getElementById('modelosDisponibles');
+        const selectButton = document.getElementById('selectModelButton');
+        const useButton = document.getElementById('useModelButton');
+        const textModels = document.getElementById('showModels');
+        
+        if (dataArray.length > 0) {
+            viewButton.style.display = 'none'; // Ocultar el botón
+            modelosSelect.style.display = 'block'; 
+            selectButton.style.display = 'block'; 
+            useButton.style.display = 'block';
+            textModels.style.display = 'block';
+            modelosSelect.innerHTML = ''; // Limpiar opciones existentes
+            dataArray.forEach(subArray => {
+                const optgroup = document.createElement('optgroup'); 
+
+                // Crear el título centrado para el primer elemento del grupo
+                const titleOption = document.createElement('option');
+                titleOption.textContent = subArray[0]; 
+                titleOption.style.textAlign = 'center'; 
+                optgroup.appendChild(titleOption); 
+
+                // Agregar las opciones restantes al optgroup
+                for (let i = 1; i < subArray.length; i++) {
+                    const opcion = document.createElement('option');
+                    opcion.disabled = true; 
+                    opcion.textContent = subArray[i]; 
+                    optgroup.appendChild(opcion); 
+                }
+
+                modelosSelect.appendChild(optgroup); // Agregar el optgroup al select
+            });
+            // dataArray.forEach(mensaje => {
+            //     const opcion = document.createElement('option');
+            //     opcion.textContent = mensaje.trim(); // Eliminar espacios al inicio y al final del mensaje
+            //     modelosSelect.appendChild(opcion);
+            // });
+        }
+    }
+    document.getElementById('viewTrainModels').addEventListener('click', function() {
+        obtenerDatosModelos();
+    });
+</script>
+
+<script>
+    //Obtener el modelo seleccionado en arhivo .zip
+    async function getSelectedModel(selectedModel) {
+        const response = await fetch('/getSelectedModel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+            body: selectedModel 
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Si la respuesta es un archivo .zip, necesitamos manejarlo como un Blob
+        const blob = await response.blob();
+
+        // Crear un enlace oculto para descargar el archivo
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(blob);
+        downloadLink.download = 'solucion.zip';
+
+        // Agregar el enlace al documento y hacer clic en él para iniciar la descarga
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+
+        // Limpiar después de la descarga
+        document.body.removeChild(downloadLink);
+    }
+
+    document.getElementById('selectModelButton').addEventListener('click', function() {
+        var modelosSelect = document.getElementById('modelosDisponibles');
+        var selectedOption = modelosSelect.options[modelosSelect.selectedIndex];
+
+
+        if (selectedOption) {
+            getSelectedModel(selectedOption.value);
+        }
+    });
+</script>
+
+<script>
+    document.getElementById('useModelButton').addEventListener('click', function (){
+        var modelosSelect = document.getElementById('modelosDisponibles');
+        console.log(modelosSelect)
+        const selectedIndex = modelosSelect.selectedIndex;
+
+        // Verificar si se ha seleccionado alguna opción
+        if (selectedIndex !== -1) {
+            const selectedOption = modelosSelect.options[selectedIndex];
+
+            const selectedOptgroup = selectedOption.closest('optgroup');
+
+            const optionsInOptgroup = selectedOptgroup.querySelectorAll('option');
+
+            const valores = [];
+
+            optionsInOptgroup.forEach(option => {
+                const texto = option.textContent.trim();
+                valores.push(texto);
+            });
+
+            const predictoras = valores.find(valor => valor.startsWith("Variables predictoras"));
+
+            // Extraer los valores dentro de los corchetes
+            let valoresPredictoras;
+            if (predictoras) {
+                const corchetesInicio = predictoras.indexOf("[");
+                const corchetesFin = predictoras.lastIndexOf("]");
+                const valoresString = predictoras.substring(corchetesInicio + 1, corchetesFin);
+                valoresPredictoras = valoresString.split(",").map(valor => valor.trim().replace(/'/g, ""));
+            }
+
+            console.log(valoresPredictoras);
+
+            document.getElementById('model-title').textContent = selectedOption.value;
+
+            var contenedorDatos = document.getElementById('container-variables');
+
+            // Limpiar el contenedor antes de agregar nuevos elementos
+            contenedorDatos.innerHTML = '';
+
+            for (var clave in valoresPredictoras) {
+                if (valoresPredictoras.hasOwnProperty(clave)) {
+                    var valor = valoresPredictoras[clave];
+                    var parrafo = document.createElement('p');
+                    parrafo.textContent = valor + ': ';
+                    
+                    // Crear un campo de entrada para introducir valores
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'text');
+                    input.setAttribute('placeholder', 'Mismo formato que CSV');
+                    input.setAttribute('data-variable', clave); // Asigna un ID único a cada campo de entrada
+                    
+                    // Agregar el campo de entrada al párrafo
+                    parrafo.appendChild(input);
+                    
+                    // Agregar el párrafo al contenedor
+                    contenedorDatos.appendChild(parrafo);
+                }
+            }
+
+            alert("Pasando a probar el modelo");
+
+            // Función para hacer clic en el enlace después de cerrar la alerta
+            window.addEventListener('focus', function onAlertClose() {
+                var predictionLink = document.querySelector('a[href="#prediction"]');
+                if (predictionLink) {
+                    predictionLink.click();
+                }
+                window.removeEventListener('focus', onAlertClose); // Remover el listener después de su ejecución
+            });
+
+        } else {
+            alert("No se ha seleccionado ningún modelo");
+        }
+
+    });
+</script>
+
+</body>
+
+</html>
+
+<!-- document.addEventListener("DOMContentLoaded", function () {
+    let ctx = document.getElementById('lineChart').getContext('2d');
+    
+    let data = {
+        labels: [0, 1, 2, 3, 4, 5, 6],
+        datasets: [{
+            label: 'Dataset 1',
+            data: [28, 48, 40, 19, 86, 27, 90],
+            borderColor: 'rgba(60,141,188,1)',
+            backgroundColor: 'transparent',
+            borderWidth: 5
+        }, {
+            label: 'Dataset 2',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            borderColor: '#c1c7d1',
+            backgroundColor: 'transparent',
+            borderWidth: 5
+        }]
+    };
+
+    let options = {
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100
+            }
+        }
+    };
+
+    let lineChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options
+    });
+}); -->
