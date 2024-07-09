@@ -1,0 +1,300 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+
+
+<section class="design-process-section" id="process-tab">
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-xs-12">
+                <!-- design process steps-->
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs process-model more-icon-preocess" role="tablist">
+                    <li role="presentation" class="active tabLi"><a href="#discover" aria-controls="discover" role="tab"
+                            data-toggle="tab"><i class="fa fa-question" aria-hidden="true"></i>
+                            <p>Tipo de problema</p>
+                        </a></li>
+                    <li role="presentation" id="cargaCsvTab" class="tabLi"><a href="#cargaCsv" id="cargaCsvLink" aria-controls="cargaCsv" role="tab" data-toggle="tab"><i
+                                class="fa fa-file" aria-hidden="true"></i>
+                            <p>Datos</p>
+                        </a></li>
+                    <li role="presentation" id="seleccionVariablesTab" class="tabLi"><a href="#seleccionVariables" id="seleccionVariablesLink" aria-controls="seleccionVariables" role="tab"
+                            data-toggle="tab"><i class="fa fa-list-alt" aria-hidden="true"></i>
+                            <p>Variables</p>
+                        </a></li>
+                    <li role="presentation" class="tabLi"><a href="#content" aria-controls="content" role="tab" data-toggle="tab"><i
+                                class="fa fa-tachometer" aria-hidden="true"></i>
+                            <p>Parámetros</p>
+                        </a></li>
+                    <li role="presentation" class="tabLi"><a href="#reporting" aria-controls="reporting" role="tab"
+                            data-toggle="tab"><i class="fa fa-search" aria-hidden="true"></i>
+                            <p>Búsqueda</p>
+                        </a></li>
+                    <li role="presentation" class="tabLi"><a href="#prediction" aria-controls="prediction" role="tab"
+                            data-toggle="tab">
+                        </a></li>
+                </ul>
+                <!-- end design process steps-->
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active button-controlled" id="discover">
+                        <div class="design-process-content problem-container">
+
+                            <h3 class="semi-bold">Seleccione tipo de problema</h3>
+                            <div class="mb-3 custom-radio-1">
+                                <form>
+                                <input type="radio" name="tipoDeProblema" value="Clasificacion" id="clasificacion">
+                                <label for="clasificacion">
+
+                                    <span>Clasificación</span>
+
+                                </label>
+                                <input type="radio" name="tipoDeProblema" value="Regresion" id="regresion">
+                                <label for="regresion">
+
+                                    <span>Regresión</span>
+
+                                </label>
+                                <input type="radio" name="tipoDeProblema" value="Agrupamientos" id="agrupamientos">
+                                <label for="agrupamientos">
+
+                                    <span>Agrupamientos</span>
+
+                                </label>
+                               
+                                
+                                <input id="confirmarTipoBtn" class="btn custom-button-2" type="submit" value="Confirmar tipo">
+                                
+
+
+                            </form>
+                            </div> 
+
+                        </div>
+                        
+                    </div>
+                    <div role="tabpanel" class="tab-pane button-controlled" id="cargaCsv">
+
+                        <div class="design-process-content">
+                            <button class="btn back-button" type="button" href="#discover"><img src="/static/images/back-arrow.svg"></button>
+                            <h3 class="semi-bold">Seleccione los datos</h3>
+                            <div class="file-upload">
+                                <div class="image-upload-wrap">
+                                    <input id="inputDataCsv" class="file-upload-input" type='file' accept=".csv" />
+                                    <div class="drag-text">
+                                        <img class="" src="/static/images/upload-loading-arrow.svg">
+                                        <h3>Arrastre o cargue el archivo desde su dispositivo</h3>
+                                        <p>Solo se admiten archivos .csv</p>
+                                        <p>(separados por "," o ";")</p>
+                                    </div>
+                                </div>
+                          
+                                
+                                <div class="fileName" id="fileName"></div>
+                                <button class="file-upload-btn custom-button-2" type="button"
+                                    onclick="$('.file-upload-input').trigger( 'click' )">Seleccionar
+                                    archivo</button>
+                                    <button id="clearFile" class="custom-button-2" onclick="clearFile()">Eliminar Archivo</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane button-controlled" id="seleccionVariables">
+                        <div class="design-process-content">
+                            <button class="btn back-button" type="button" href="#cargaCsv" id="cargaCsvLink"><img src="/static/images/back-arrow.svg"></button>
+                            <h3 class="semi-bold">Seleccione las variables</h3>
+                            <h4  class="text-center">Variables Predictoras</h4>
+                            <div class="dual-list-box">
+                                <div class="left-column">
+                                  <h5>Variables disponibles</h5>
+                                  <select multiple size="10" id="variablesDependientesDisponibles"></select>
+                                  <button class="custom-button-2 custom-button-2-mini" id="addDependiente">Añadir variable</button>
+                                </div>
+                                <div class="right-column">
+                                  <h5>Variables seleccionadas</h5>
+                                  <select multiple size="10" id="variablesDependientes"></select>
+                                  <button class="custom-button-2 custom-button-2-mini" id="removeDependiente">Eliminar variable</button>
+                                </div>
+                              </div>
+                              
+                            
+                              <h4 class="text-center">Variable Objetivo</h4>
+                              <div class="dual-list-box">
+                                <div class="left-column">
+                                  <h5>Variables disponibles</h5>
+                                  <select size="10" id="variablesIndependientesDisponibles"></select>
+                                  <button class="custom-button-2 custom-button-2-mini" id="addIndependiente">Añadir variable</button>
+                                </div>
+                                <div class="right-column">
+                                  <h5>Variable seleccionada</h5>
+                                  <select multiple size="10" id="variablesIndependientes"></select>
+                                  <button class="custom-button-2 custom-button-2-mini" id="removeIndependiente">Eliminar variable</button>
+                                </div>
+                              </div>
+                             
+                              
+
+                            
+                       
+                                <button id="confirmarVariables" class="custom-button-2">Confirmar variables</button>
+                        </div>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane button-controlled" id="content">
+                        <div class="design-process-content">
+                            <button class="btn back-button" type="button"  href="#seleccionVariables" id="seleccionVariablesLink"><img src="/static/images/back-arrow.svg"></button>
+                            <h3 class="semi-bold">Configuración parámetros de búsqueda</h3>
+                            <div class="container">
+                                <div class="form">
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+                                            <label for="inputVal" class="form-label">Tamaño validacion</label>
+                                            <input type="range" class="form-range" min="0" max="2" step="0.15"
+                                                id="inputVal" value="0.3">
+                                            <p>Valor: <span id="resultParameter-1"></span></p>
+                                        </div>
+                                        <div class="col-md-6 columna-select">
+                                            <label class="form-label" style="
+                                            margin-bottom: -9px;"">Métrica</label>
+                                            
+                                            <select name="select-Clasificacion" class="select-Clasificacion">
+                                                <option value="accuracy">accuracy</option>
+                                                <option value="balance_accuracy">balance_accuracy</option>
+                                                <option value="f1">f1</option>
+                                                <option value="precision">precision</option>
+                                                <option value="recall">recall</option>
+                                            </select>
+                                            <select name="select-Regresion" class="select-Regresion">
+                                                <option value="r2">r2</option>
+                                                <option value="mean absolute error">mean absolute error</option>
+                                                <option value="mean squared error">mean squared error</option>
+                                                <option value="explained variance">explained variance</option>
+                                            </select>
+                                            <select name="select-Agrupamientos" class="select-Agrupamientos">
+                                                <option value="silhouette coefficient">silhouette_score</option>
+                                                <option value="calinski harabasz">calinski_harabasz_score</option>
+                                                <option value="rand index">rand index</option>
+                                            </select>
+                                       
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="crossval" class="form-label">Cross validation steps</label>
+                                            <input type="range" class="form-range" min="1" max="20" step="1"
+                                                id="crossval" value="10">
+                                            <p>Valor: <span id="resultParameter-2"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="limite" class="form-label">Límite de iteraciones</label>
+                                            <input type="range" class="form-range" min="50" max="5000" step="50"
+                                                id="limite" value="200">
+                                            <p>Valor: <span id="resultParameter-3"></span></p>
+                                        </div>
+                                        <div class="col-md-6 columna-select">
+                                            <label class="form-label">Datos de entrada</label>
+                                            <select name="selectDataType" class="selectDataType">
+                                                <option value="integer">Integer</option>
+                                                <option value="real">Real</option>
+                                                <option value="string">String</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="maxTime" class="form-label">Max. Time for Training (Seconds)</label>
+                                            <input type="range" class="form-range" min="10" max="3600" step="25" id="maxTime"
+                                            value="60">
+                                            <p>Valor: <span id="resultParameter-4"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="title" class="form-label">Título</label>
+                                            <input type="text" class="form-control" id="title">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="description" class="form-label">Descripción conunto de datos</label>
+                                            <input type="text" class="form-control" id="description">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="confirmarParametros" class="btn custom-button-2">Confirmar parámetros</button>
+
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane button-controlled" id="reporting">
+                        <div class="design-process-content">
+                            <button class="btn back-button" type="button"  href="#content"><img src="/static/images/back-arrow.svg"></button>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <h3>Búsqueda</h3>
+                                    <button id="startButton" class="btn custom-button-2" style="margin-bottom: 32px;">Start 
+                                        <i class="fa-solid fa-power-off"></i></button>
+                                </div>
+                                <div class="col-lg-6">
+                                    <h3>Parámetros de entrada</h3>
+                                    <button id="exportDataButton" class="btn custom-button-2" style="margin-bottom: 32px;">Export data<i
+                                    class="fa-solid"></i></button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">  
+                                        <!--<canvas id="lineChart" width="250" height="250" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>  -->                                
+                                        <div id="tablero" class="tablero" style="display: none;"></div>
+                                </div>
+                                <div class="col-lg-6 columna-select">
+                                    <!-- <label for="selectSoluciones" class="form-label">Solución</label> -->
+                                    <div id="tablero2" class="tablero" style="display: none;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <button id="exportButton" class="btn custom-button-2" style="display: none;">Exportar solución</button>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <button id="predictButton" class="btn custom-button-2" style="display: none;">Probar solución</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3>Obtener modelos preentrenados</h3>
+                                <div class="dual-list-box">
+                                    <div class="left-column">
+                                      <h5 style="display: none; text-align: center;" id="showModels">Modelos</h5>
+                                      <select multiple size="10" id="modelosDisponibles" class="tablero-models" style="display: none;"></select>
+                                    </div>
+                                    <div class="right-column">
+                                      <button class="custom-button-2 custom-button-2" id="selectModelButton" style="display: none;">Exportar modelo</button>
+                                      <button class="custom-button-2 custom-button-2" id="useModelButton" style="display: none;">Utilizar modelo</button>
+                                    </div>
+                                </div>
+                                <button id="viewTrainModels" class="btn custom-button-2" style="margin-bottom: 32px; max-width: 400px">Ver Modelos entrenados<i class="fa-solid"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane button-controlled" id="prediction">
+                        <div class="design-process-content">
+                            <button class="btn back-button" type="button"  href="#reporting"><img src="/static/images/back-arrow.svg"></button>
+                            <div class="form">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <h3>Introducir valores</h3>
+                                        <h4 class="text-center"><span id="model-title"></span></p>
+                                        <div id="container-variables"></div>
+                                        <button id="obtenerSolucion" class="btn custom-button-2">Predecir resultado</button>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <h3>Resultado del modelo</h3>
+                                        <span style="font-size: 1.5em;">Resultado predicción: </span><span id="resultadoModelo" style="font-size: 1.5em;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+</section>
+
+
+
+{% endblock %}

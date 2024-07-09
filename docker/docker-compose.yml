@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+    gplsi-autogoal-server:
+        image: gplsi_autogoal_server:latest
+        container_name: gplsi-autogoal-server
+        restart: always
+        privileged: true
+        build: ./server
+        ports:
+          - 8101:4239
+        volumes:
+          - ./server/startup:/app/docker/startup
+          - ../_tmp/logs/server:/app/_tmp/logs
+        environment:
+          - "LOGS_FOLDER=/app/_tmp/logs"
+          - "SERVER_WORKERS=2"
+          - "SERVER_THREADS=2"
+          - "EMAIL_ACCOUNT=admin@example.com"
+        user: root
+        entrypoint: ["/app/docker/startup/entrypoint.sh"]
+    
+    gplsi-autogoal-gui:
+        image: gplsi_autogoal_gui:latest
+        container_name: gplsi-autogoal-gui
+        restart: always
+        privileged: true
+        build: ./gui
+        ports:
+          - 8102:3000
+        # map the source code of the app
+        volumes:
+          - ../app:/app
+          - ./gui/startup:/app/docker/startup
+          - ../_tmp/logs/gui:/app/_tmp/logs
+        environment:
+          - "LOGS_FOLDER=/app/_tmp/logs"
+          - "SERVER_WORKERS=2"
+          - "SERVER_THREADS=2"
+          - "EMAIL_ACCOUNT=admin@example.com"
+        user: root
+        entrypoint: ["/app/docker/startup/entrypoint.sh"]
+        

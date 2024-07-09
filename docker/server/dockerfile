@@ -1,0 +1,25 @@
+# very clumsy, but we need this working ASAP
+FROM autogoal/autogoal:full-latest
+
+# stuff to run the server as a service
+USER root
+RUN apt-get update
+RUN apt-get install -y supervisor nginx nano less curl g++ protobuf-compiler libprotobuf-dev
+
+ENV SERVER_WORKERS=2
+ENV SERVER_THREADS=2
+
+EXPOSE 4239 
+
+
+# set autogoal image user
+USER coder
+
+# copy autogoal server source (Julian's new development)
+COPY ./utils/web/ /home/coder/autogoal/autogoal/web/
+COPY ./utils/ml/* /home/coder/autogoal/autogoal/autogoal/ml/
+COPY ./utils/autogoal_contrib/* /home/coder/autogoal/autogoal-contrib/autogoal_contrib/autogoal_contrib/
+COPY ./utils/logging/* /home/coder/autogoal/autogoal/autogoal/logging/
+
+
+
