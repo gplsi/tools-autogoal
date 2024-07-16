@@ -3,7 +3,7 @@ import websockets
 import asyncio
 from pydantic import BaseModel
 
-baseURL = '127.0.0.1:8765'
+BASE_URL = '127.0.0.1:8765'
 
 
 app = FastAPI()
@@ -42,7 +42,7 @@ async def receive_message(message: Message):
 async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.accept()
-        async with websockets.connect(f'ws://{baseURL}/autogoal/autogoal/web') as other_websocket:
+        async with websockets.connect(f'ws://{BASE_URL}/autogoal/autogoal/web') as other_websocket:
             response = ""
             data=""
             while True:
