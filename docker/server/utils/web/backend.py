@@ -31,6 +31,19 @@ from autogoal.search import (Logger, PESearch, ConsoleLogger, ProgressLogger, Me
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+# base URL for AutoGoal API
+URL_BASE = os.getenv('SERVER_URL', '127.0.0.1:4239')
+DIR_MODELS = '/home/coder/autogoal/autogoal/web/temporalModels'
+
+# ensure the folder exists
+if not os.path.exists(DIR_MODELS):
+   # Create a new directory because it does not exist
+   os.makedirs(DIR_MODELS)
+
+
+TRAIN_DATA = '/home/coder/autogoal/autogoal/web/train_data.data'
+TRAIN_LABELS = '/home/coder/autogoal/autogoal/web/train_labels.data'
+
 def agregar_carpeta_a_zip(archivo_zip, carpeta):
     for raiz, _, archivos in os.walk(carpeta):
         for archivo in archivos:
@@ -63,7 +76,7 @@ async def handle_connection(websocket, path):
     data = data_bytes.decode('utf-8')
     dataType = ""
     tam = 0
-    directorio_principal= '/home/coder/autogoal/autogoal/web/temporalModels'
+    directorio_principal = DIR_MODELS
 
     if data == "get": # Envía el archivo zip del modelo recién entrenado
         # Read the zip file in binary mode
@@ -184,7 +197,7 @@ async def handle_connection(websocket, path):
         num_rows = 1
 
         directory_name = found_model(directorio_principal,parameters_all["titulo"])
-        description = open(f"/home/coder/autogoal/autogoal/web/temporalModels/{directory_name}/description.txt", "r")
+        description = open(f"{DIR_MODELS}/{directory_name}/description.txt", "r")
         for line in description:
             if "Datatype" in line:
                 dataType = line.split(": ")[1].strip()
@@ -194,7 +207,7 @@ async def handle_connection(websocket, path):
             res = {}
             vectorizer = None
 
-            with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{directory_name}", "vectorizer.pkl"), "rb") as f:
+            with open(os.path.join(f"{DIR_MODELS}/{directory_name}", "vectorizer.pkl"), "rb") as f:
                 vectorizer = pickle.load(f)
 
             line = parameters_dict["0"]
@@ -222,7 +235,7 @@ async def handle_connection(websocket, path):
             # print(f"Parameters: {parameters_all}")
         
         objeto_recuperado = None
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{directory_name}", "automl.pkl"), "rb") as f:
+        with open(os.path.join(f"{DIR_MODELS}/{directory_name}", "automl.pkl"), "rb") as f:
             objeto_recuperado = pickle.load(f)
 
         result = objeto_recuperado.predict(Xvalid)
@@ -230,7 +243,7 @@ async def handle_connection(websocket, path):
         if dataType == "string":
             label_encoder = None
             
-            with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{directory_name}", "label_encoder.pkl"), "rb") as f:
+            with open(os.path.join(f"{DIR_MODELS}/{directory_name}", "label_encoder.pkl"), "rb") as f:
                 label_encoder = pickle.load(f)
             result = label_encoder.inverse_transform(result)
 
@@ -288,8 +301,8 @@ async def handle_connection(websocket, path):
         await websocket.close()
         print(f"IP data: {ip_data}")
 
-        train_data = open("/home/coder/autogoal/autogoal/web/train_data.data", "r")
-        train_labels = open("/home/coder/autogoal/autogoal/web/train_labels.data", "r")
+        train_data = open(f"{TRAIN_DATA}", "r")
+        train_labels = open(f"{TRAIN_LABELS}", "r")
 
         num_lines_train_data = sum(1 for line in train_data)
 
@@ -354,7 +367,7 @@ async def handle_connection(websocket, path):
             objectives=valor
         )
 
-        uri = f"http://172.17.0.2:4239"
+        uri = f"http://{URL_BASE}"
         mylogger = WebSocketLogger(uri,ip_data)
 
         # # Run the pipeline search process
@@ -364,9 +377,9 @@ async def handle_connection(websocket, path):
         # print(automl.best_pipelines_)
         # print(automl.best_scores_)
 
-        automl.export_portable(path=f"/home/coder/autogoal/autogoal/web/temporalModels/",generate_zip=True,identifier=data_dict['title'])
+        automl.export_portable(path=f"{DIR_MODELS}/",generate_zip=True,identifier=data_dict['title'])
 
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{data_dict['title']}", f'description.txt'), 'w') as f:
+        with open(os.path.join(f"{DIR_MODELS}/{data_dict['title']}", f'description.txt'), 'w') as f:
             f.write(f"Nombre: {data_dict['title']}\n")
             f.write(f"Descripción: {data_dict['description']}\n")
             f.write(f"Tipo de problema: {data_dict['problemaSeleccionado']}\n")
@@ -375,7 +388,7 @@ async def handle_connection(websocket, path):
             f.write(f"Datatype: {dataType}\n")
             f.write(f"Metrica: {data_dict['metrica']}")
         
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{data_dict['title']}", "automl.pkl"), "wb") as f:
+        with open(os.path.join(f"{DIR_MODELS}/{data_dict['title']}", "automl.pkl"), "wb") as f:
             pickle.dump(automl, f)
 
     elif dataType == "string":
@@ -383,10 +396,10 @@ async def handle_connection(websocket, path):
         await websocket.close()
         print(f"IP data: {ip_data}")
 
-        with open("/home/coder/autogoal/autogoal/web/train_data.data", "r") as file:
+        with open(f"{TRAIN_DATA}", "r") as file:
             train_data = file.read().splitlines()
 
-        with open("/home/coder/autogoal/autogoal/web/train_labels.data", "r") as file:
+        with open(f"{TRAIN_LABELS}", "r") as file:
             train_labels = file.read().splitlines()
 
         min_length = min(len(train_data), len(train_labels)) #Solucionar este error
@@ -467,7 +480,7 @@ async def handle_connection(websocket, path):
             **search_kwargs
         )
 
-        uri = f"http://172.17.0.2:4239"
+        uri = f"http://{URL_BASE}"
         mylogger = WebSocketLogger(uri,ip_data)
         #print(train_tfidf)
         #print(train_labels)
@@ -475,9 +488,9 @@ async def handle_connection(websocket, path):
         # Run the pipeline search process
         automl.fit(train_tfidf, train_labels, logger=mylogger)
 
-        automl.export_portable(path=f"/home/coder/autogoal/autogoal/web/temporalModels/",generate_zip=True,identifier=data_dict['title'])
+        automl.export_portable(path=f"{DIR_MODELS}/",generate_zip=True,identifier=data_dict['title'])
 
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{data_dict['title']}", f'description.txt'), 'w') as f:
+        with open(os.path.join(f"{DIR_MODELS}/{data_dict['title']}", f'description.txt'), 'w') as f:
             f.write(f"Nombre: {data_dict['title']}\n")
             f.write(f"Descripción: {data_dict['description']}\n")
             f.write(f"Tipo de problema: {data_dict['problemaSeleccionado']}\n")
@@ -486,14 +499,14 @@ async def handle_connection(websocket, path):
             f.write(f"Datatype: {dataType}\n")
             f.write(f"Metrica: {data_dict['metrica']}")
         
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{data_dict['title']}", "automl.pkl"), "wb") as f:
+        with open(os.path.join(f"{DIR_MODELS}/{data_dict['title']}", "automl.pkl"), "wb") as f:
             pickle.dump(automl, f)
 
         # guardar TfidfVectorizer entrenado para su posterior uso (codificar nuevos datos).
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{data_dict['title']}", "vectorizer.pkl"), "wb") as f:
+        with open(os.path.join(f"{DIR_MODELS}/{data_dict['title']}", "vectorizer.pkl"), "wb") as f:
             pickle.dump(vectorizer, f)
 
-        with open(os.path.join(f"/home/coder/autogoal/autogoal/web/temporalModels/{data_dict['title']}", "label_encoder.pkl"), "wb") as f:
+        with open(os.path.join(f"{DIR_MODELS}/{data_dict['title']}", "label_encoder.pkl"), "wb") as f:
             pickle.dump(label_encoder, f)
 
 

@@ -17,13 +17,17 @@ services:
           - "SERVER_WORKERS=2"
           - "SERVER_THREADS=2"
           - "EMAIL_ACCOUNT=admin@example.com"
+          - "SERVER_URL=gplsi-autogoal-server:4239"
         user: root
-        entrypoint: ["/app/docker/startup/entrypoint.sh"]
-    
+#        entrypoint: ["/app/docker/startup/entrypoint.sh"]
+        command: tail -F anything
+ 
     gplsi-autogoal-gui:
         image: gplsi_autogoal_gui:latest
         container_name: gplsi-autogoal-gui
         restart: always
+        depends_on: 
+            - gplsi-autogoal-server
         privileged: true
         build: ./gui
         ports:
@@ -38,6 +42,7 @@ services:
           - "SERVER_WORKERS=2"
           - "SERVER_THREADS=2"
           - "EMAIL_ACCOUNT=admin@example.com"
+          - "SERVER_URL=gplsi-autogoal-server:4239"
         user: root
-        entrypoint: ["/app/docker/startup/entrypoint.sh"]
-        
+#        entrypoint: ["/app/docker/startup/entrypoint.sh"]
+        command: tail -F anything        
