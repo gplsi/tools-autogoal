@@ -19,8 +19,8 @@ services:
           - "EMAIL_ACCOUNT=admin@example.com"
           - "SERVER_URL=gplsi-autogoal-server:4239"
         user: root
-#        entrypoint: ["/app/docker/startup/entrypoint.sh"]
-        command: tail -F anything
+        entrypoint: ["/app/docker/startup/entrypoint.sh"]
+#        command: tail -F anything
  
     gplsi-autogoal-gui:
         image: gplsi_autogoal_gui:latest
@@ -44,5 +44,5 @@ services:
           - "EMAIL_ACCOUNT=admin@example.com"
           - "SERVER_URL=gplsi-autogoal-server:4239"
         user: root
-#        entrypoint: ["/app/docker/startup/entrypoint.sh"]
-        command: tail -F anything        
+        entrypoint: ["/app/docker/startup/entrypoint.sh"]
+#        command: tail -F anything        

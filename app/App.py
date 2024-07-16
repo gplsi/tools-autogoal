@@ -1,3 +1,4 @@
+import os
 import logging
 from fastapi import FastAPI, WebSocket, Request
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -7,6 +8,9 @@ import json
 import base64
 import websockets
 from io import BytesIO
+
+# base URL for AutoGoal API
+BASE_URL = os.getenv('SERVER_URL', '127.0.0.1:4239')
 
 # Create a FastAPI instance
 app = FastAPI()
@@ -48,7 +52,7 @@ async def obtener_datos():
 
 @app.get('/getTrainModels')
 async def get_train_models():
-    uri = "ws://172.17.0.2:4239/ws"
+    uri = f"ws://{BASE_URL}/ws"
     async with websockets.connect(uri) as websocket:
         await websocket.send(b"getTrainModels")
         response = await websocket.recv()
@@ -57,7 +61,7 @@ async def get_train_models():
         return response
 
 async def send_text(text_data, info,unique_id):
-    uri = "ws://172.17.0.2:4239/ws"  # IP address of the FastAPI instance
+    uri = f"ws://{BASE_URL}/ws"  # IP address of the FastAPI instance
     async with websockets.connect(uri) as websocket:
         await websocket.send(b"Data")  # Aquí convertimos la cadena "Data" a bytes
         response = await websocket.recv()
@@ -79,7 +83,7 @@ async def save_txt(request: Request):
     return JSONResponse(content={"message": "Data saved successfully"}, status_code=200)
 
 async def send_json(json_data):
-    uri = "ws://172.17.0.2:4239/ws"
+    uri = f"ws://{BASE_URL}/ws"
     datos_recibidos.clear()
     async with websockets.connect(uri, extra_headers=[("Content-Type", "application/json")]) as websocket:
         await websocket.send(b"Json")
@@ -101,7 +105,7 @@ async def save_json(request: Request):
 
     
 async def send_parameters(json_values):
-    uri = "ws://172.17.0.2:4239/ws"
+    uri = f"ws://{BASE_URL}/ws"
     async with websockets.connect(uri, extra_headers=[("Content-Type", "application/json")]) as websocket:
         await websocket.send(b"Prediction")
         response = await websocket.recv()
@@ -120,7 +124,7 @@ async def get_result(request: Request):
     return result
 
 async def get_model():
-    uri = "ws://172.17.0.2:4239/ws"  # IP address of the FastAPI instance
+    uri = f"ws://{BASE_URL}/ws"  # IP address of the FastAPI instance
     async with websockets.connect(uri, extra_headers=[("Content-Type", "application/json")]) as websocket:
         await websocket.send(b"get")
         response = await websocket.recv()
@@ -137,7 +141,7 @@ async def get_zipmodel():
     return StreamingResponse(zip_io, media_type="application/zip")
     
 async def get_old_model(model_name):
-    uri = "ws://172.17.0.2:4239/ws"  # IP address of the FastAPI instance
+    uri = f"ws://{BASE_URL}/ws"  # IP address of the FastAPI instance
     async with websockets.connect(uri) as websocket:
         await websocket.send(b"getOldModel")
         response = await websocket.recv()
